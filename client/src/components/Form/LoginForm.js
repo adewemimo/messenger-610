@@ -13,6 +13,9 @@ import AppTextField from '../Form/AppTextField';
 const useStyles = makeStyles(theme => ({
   form: {
     padding: '0 4rem',
+    [theme.breakpoints.down('sm')]: {
+      padding: '0',
+    }
   },
   loginButton: {
     fontFamily: 'Montserrat, sans-serif',

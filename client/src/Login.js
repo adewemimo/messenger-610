@@ -47,7 +47,6 @@ const Login = props => {
         container
         xs={12}
         md={7}
-        lg={8}
         direction="column"
         className={classes.formContainer}>
         <FormHeader formType="login" />

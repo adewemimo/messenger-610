@@ -11,6 +11,9 @@ import AppTextField from '../Form/AppTextField';
 const useStyles = makeStyles(theme => ({
   form: {
     padding: '0 4rem',
+    [theme.breakpoints.down('sm')]: {
+      padding: '0',
+    }
   },
   registerButton: {
     fontFamily: 'Montserrat, sans-serif',
