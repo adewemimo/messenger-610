@@ -11,10 +11,10 @@ import FormHeader from './components/Form/Header';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: '100vh',
+    minHeight: '100%',
   },
   formContainer: {
-    height: '100%',
+    minHeight: '100vh',
     padding: '0 4rem',
   },
 }));

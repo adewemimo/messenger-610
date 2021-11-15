@@ -33,7 +33,7 @@ const RegisterForm = ({ handleRegister, formErrorMessage }) => {
     <form onSubmit={handleRegister}>
       <Grid className={classes.form}>
         <Typography variant="h4" className={classes.headerText}>
-          Create an account
+          Create an account.
         </Typography>
         <Grid>
           <FormControl required fullWidth margin="normal">

@@ -8,8 +8,11 @@ import { grey } from '@material-ui/core/colors';
 const useStyles = makeStyles(theme => ({
   container: {
     padding: '2rem 0 4rem',
-    marginBottom: '6rem',
+    marginBottom: '5rem',
     alignSelf: 'flex-end',
+    [theme.breakpoints.down('md')]: {
+      marginBottom: '1rem',
+    }
   },
   copy: {
     color: grey[400],
@@ -21,11 +24,13 @@ const useStyles = makeStyles(theme => ({
     },
   },
   actionButton: {
-    padding: '1rem 2rem',
+    padding: '1rem 3rem',
     marginLeft: '1rem',
     backgroundColor: 'white',
-    color: '#3A8DFF',
+    color: theme.palette.primary.main,
     fontSize: '1.2rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 12px 0 rgba(74,106,149,0.20)',
     [theme.breakpoints.down('sm')]: {
       fontSize: '1rem',
       marginLeft: '0.5rem',
@@ -64,7 +69,7 @@ const FormHeader = ({ formType }) => {
         {header.title}
       </Typography>
       <Button
-        variant="contained"
+        variant="text"
         onClick={() => history.push(header.actionLink)}
         className={classes.actionButton}>
         {header.actionLabel}

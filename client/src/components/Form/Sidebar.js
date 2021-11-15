@@ -5,7 +5,7 @@ import { theme } from '../../themes/theme';
 
 const useStyles = makeStyles(theme => ({
   intro: {
-    height: '100%',
+    height: '100vh',
     background: "linear-gradient(#3A8DFF, #86B9FF), url('/bg-img.png')",
     backgroundPosition: 'center',
     backgroundSize: 'cover',
