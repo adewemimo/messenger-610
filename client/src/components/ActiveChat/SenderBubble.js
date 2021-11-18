@@ -35,12 +35,15 @@ const SenderBubble = props => {
   return (
     <Box className={classes.root}>
       <Typography className={classes.date}>{time}</Typography>
-      {attachments && attachments.length > 0 && (
+      {attachments?.length === 1 && (
         <MessageAttachments attachments={attachments} text={text} />
       )}
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      {attachments?.length > 1 && (
+        <MessageAttachments attachments={attachments} text={text} />
+      )}
     </Box>
   );
 };

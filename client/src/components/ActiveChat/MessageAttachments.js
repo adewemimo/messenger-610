@@ -19,12 +19,14 @@ const useStyles = makeStyles(theme => ({
 const MessageAttachments = ({ attachments, text }) => {
   const classes = useStyles();
 
+  attachments = attachments.map(attachment => JSON.parse(attachment));
+
   return (
     <ImageList className={classes.root} cols={3} rowHeight={132} gap={0}>
-      {attachments.map((image, index) => (
-        <ImageListItem key={index}>
+      {attachments.map(attachment => (
+        <ImageListItem key={attachment.id}>
           <img
-            src={image}
+            src={attachment.image}
             className={classes.image}
             alt={text}
             loading="lazy"

@@ -8,13 +8,15 @@ import {
 } from '../conversations';
 import { gotUser, setFetchingStatus } from '../user';
 
-const axios_internal = axios.create();
+const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_ACCOUNT_NAME = process.env.REACT_APP_CLOUDINARY_ACCOUNT_NAME;
 
-const axios_public = axios.create({
-  baseURL: 'https://api.cloudinary.com/v1_1/wemimo',
+const axiosInternal = axios.create();
+const axiosCloudinary = axios.create({
+  baseURL: `https://api.cloudinary.com/v1_1/${CLOUDINARY_ACCOUNT_NAME}`,
 });
 
-axios_internal.interceptors.request.use(async function (config) {
+axiosInternal.interceptors.request.use(async function (config) {
   const token = await localStorage.getItem('messenger-token');
   config.headers['x-access-token'] = token;
 
@@ -26,7 +28,7 @@ axios_internal.interceptors.request.use(async function (config) {
 export const fetchUser = () => async dispatch => {
   dispatch(setFetchingStatus(true));
   try {
-    const { data } = await axios_internal.get('/auth/user');
+    const { data } = await axiosInternal.get('/auth/user');
     dispatch(gotUser(data));
     if (data.id) {
       socket.emit('go-online', data.id);
@@ -40,7 +42,7 @@ export const fetchUser = () => async dispatch => {
 
 export const register = credentials => async dispatch => {
   try {
-    const { data } = await axios_internal.post('/auth/register', credentials);
+    const { data } = await axiosInternal.post('/auth/register', credentials);
     await localStorage.setItem('messenger-token', data.token);
     dispatch(gotUser(data));
     socket.emit('go-online', data.id);
@@ -52,7 +54,7 @@ export const register = credentials => async dispatch => {
 
 export const login = credentials => async dispatch => {
   try {
-    const { data } = await axios_internal.post('/auth/login', credentials);
+    const { data } = await axiosInternal.post('/auth/login', credentials);
     await localStorage.setItem('messenger-token', data.token);
     dispatch(gotUser(data));
     socket.emit('go-online', data.id);
@@ -64,7 +66,7 @@ export const login = credentials => async dispatch => {
 
 export const logout = id => async dispatch => {
   try {
-    await axios_internal.delete('/auth/logout');
+    await axiosInternal.delete('/auth/logout');
     await localStorage.removeItem('messenger-token');
     dispatch(gotUser({}));
     socket.emit('logout', id);
@@ -77,7 +79,7 @@ export const logout = id => async dispatch => {
 
 export const fetchConversations = () => async dispatch => {
   try {
-    const { data } = await axios_internal.get('/api/conversations');
+    const { data } = await axiosInternal.get('/api/conversations');
     data.forEach(conversation =>
       conversation.messages.sort(
         (message1, message2) =>
@@ -91,7 +93,7 @@ export const fetchConversations = () => async dispatch => {
 };
 
 const saveMessage = async body => {
-  const { data } = await axios_internal.post('/api/messages', body);
+  const { data } = await axiosInternal.post('/api/messages', body);
   return data;
 };
 
@@ -123,7 +125,7 @@ export const postMessage = body => async dispatch => {
 
 export const searchUsers = searchTerm => async dispatch => {
   try {
-    const { data } = await axios_internal.get(`/api/users/${searchTerm}`);
+    const { data } = await axiosInternal.get(`/api/users/${searchTerm}`);
     dispatch(setSearchedUsers(data));
   } catch (error) {
     console.error(error);
@@ -132,15 +134,16 @@ export const searchUsers = searchTerm => async dispatch => {
 
 export const postImagesToCloudinary = body => async dispatch => {
   try {
+    let attachments = [];
     for (let i = 0; i < body.attachments.length; i++) {
       const formData = new FormData();
       formData.append('file', body.attachments[i]);
-      formData.append('upload_preset', 'wemo-chat');
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
       formData.append('folder', body.conversationId);
-      const { data } = await axios_public.post('/image/upload', formData);
-      console.log(data)
-      body.attachments[i] = data.secure_url;
+      const { data } = await axiosCloudinary.post('/image/upload', formData);
+      attachments.push({ id: data.asset_id, image: data.secure_url });
     }
+    body = { ...body, attachments };
     dispatch(postMessage(body));
   } catch (error) {
     console.error(error);
