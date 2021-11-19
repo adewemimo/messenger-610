@@ -132,19 +132,24 @@ export const searchUsers = searchTerm => async dispatch => {
   }
 };
 
-export const postImagesToCloudinary = body => async dispatch => {
+export const postImagesToCloudinary = body => dispatch => {
   try {
-    let attachments = [];
+    let imageUploadPromises = [];
     for (let i = 0; i < body.attachments.length; i++) {
       const formData = new FormData();
       formData.append('file', body.attachments[i]);
       formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
       formData.append('folder', body.conversationId);
-      const { data } = await axiosCloudinary.post('/image/upload', formData);
-      attachments.push({ id: data.asset_id, image: data.secure_url });
+      imageUploadPromises.push(axiosCloudinary.post('/image/upload', formData));
     }
-    body = { ...body, attachments };
-    dispatch(postMessage(body));
+    Promise.all(imageUploadPromises).then(responses => {
+      let attachments = [];
+      responses.forEach(response => {
+        const { data } = response;
+        attachments.push({ id: data.asset_id, image: data.secure_url });
+      });
+      dispatch(postMessage({ ...body, attachments }));
+    });
   } catch (error) {
     console.error(error);
   }
